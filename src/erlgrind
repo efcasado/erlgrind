@@ -51,8 +51,9 @@ process_entry(OutFile, {_CallingList, Actual, CalledList}) ->
 
 process_actual(OutFile, {Func, _Cnt, _Acc, Own}) ->
     File = get_file(Func),
+    Fun = get_fun_name(Func),
     io:format(OutFile, "fl=~w~n", [File]),
-    io:format(OutFile, "fn=~w~n", [Func]),
+    io:format(OutFile, "fn=~s~n", [Fun]),
     io:format(OutFile, "1 ~w~n", [trunc(Own*1000)]).
 
 process_called_list(_, []) ->
@@ -63,10 +64,16 @@ process_called_list(OutFile, [Called | Rest]) ->
 
 process_called(OutFile, {Func, Cnt, Acc, _Own}) ->
     File = get_file(Func),
+    Fun = get_fun_name(Func),
     io:format(OutFile, "cfl=~w~n", [File]),
-    io:format(OutFile, "cfn=~w~n", [Func]),
+    io:format(OutFile, "cfn=~s~n", [Fun]),
     io:format(OutFile, "calls=~w 1~n", [Cnt]),
     io:format(OutFile, "1 ~w~n", [trunc(Acc*1000)]).
+
+get_fun_name({M, F, A}) ->
+    io_lib:format("~s:~s/~w", [M, F, A]);
+get_fun_name(F) ->
+    F.
 
 get_file({Mod, _Func, _Arity}) ->
     Mod;
