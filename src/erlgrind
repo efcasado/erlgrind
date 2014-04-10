@@ -18,7 +18,7 @@ main(Params) ->
             AnalysisFile = maybe_convert_trace(Opts),
             {ok, OutFile} = file:open(Opts#opts.out_file, [write]),
             {ok, Terms} = file:consult(AnalysisFile),
-            io:format(OutFile, "events: Time~n", []),
+            io:format(OutFile, "events: Time~n~n", []),
             process_terms(OutFile, Terms, Opts)
     catch
         throw:help ->
@@ -33,7 +33,7 @@ process_terms(OutFile, [], _Opts) ->
 process_terms(OutFile, [{analysis_options, _Opt} | Rest], Opts) ->
     process_terms(OutFile, Rest, Opts);
 process_terms(OutFile, [[{totals, _Cnt, Acc, _Own}] | Rest], Opts) ->
-    io:format(OutFile, "summary: ~w~n", [trunc(Acc*1000)]),
+    io:format(OutFile, "summary: ~w~n~n", [trunc(Acc*1000)]),
     process_terms(OutFile, Rest, Opts);
 process_terms(OutFile, [[{Pid, _Cnt, _Acc, _Own} | _T] | Rest], Opts) 
         when is_list(Pid) and (Opts#opts.pid =:= true) ->
@@ -48,7 +48,8 @@ process_terms(OutFile, [Entry | Rest], Opts) ->
 process_entry(OutFile, {_CallingList, Actual, CalledList}) ->
     {ActualFunc, _Cnt, _Acc, _Own} = Actual,
     process_actual(OutFile, Actual),
-    process_called_list(OutFile, ActualFunc, CalledList).
+    process_called_list(OutFile, ActualFunc, CalledList),
+    io:format(OutFile, "~n", []).
 
 process_actual(OutFile, {Func, _Cnt, _Acc, Own}) ->
     File = get_file(Func),
